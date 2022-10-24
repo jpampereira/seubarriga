@@ -1,0 +1,38 @@
+version: '3.9'
+
+### VOLUMES ##############################################################################
+volumes:
+  db-data:
+  db_client-data:
+
+### SERVICES #############################################################################
+services:
+  
+  ## DATABASES ###############################################
+  db:
+    container_name: db
+    image: postgres:14.1-bullseye # https://hub.docker.com/_/postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - TZ=America/Sao_Paulo
+      - PGTZ=America/Sao_Paulo
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  db_client:
+    container_name: db_client
+    image: dpage/pgadmin4:6.1 # https://hub.docker.com/r/dpage/pgadmin4/
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@postgres.com.br
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+    ports:
+      - 5050:80
+    volumes:
+      - db_client-data:/var/lib/pgadmin
+    links:
+      - db
+    depends_on:
+      - db
