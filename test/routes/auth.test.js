@@ -45,7 +45,7 @@ test('Não deve autenticar usuário com email errado', async () => {
 });
 
 test('Não deve acessar uma rota protegida sem token', async () => {
-  await request(app).get('/users')
+  await request(app).get('/v1/users')
     .then((res) => {
       expect(res.status).toBe(401);
     });
