@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/ValidationError');
+
 module.exports = (app) => {
   const find = (userId, filter = {}) => app.db('transactions')
     .join('accounts', 'accounts.id', 'acc_id')
@@ -5,7 +7,25 @@ module.exports = (app) => {
     .andWhere('accounts.user_id', '=', userId)
     .select();
 
-  const save = (transaction) => app.db('transactions').insert(transaction, '*');
+  const save = (transaction) => {
+    if (!transaction.description) throw new ValidationError('Descrição é um atributo obrigatório');
+    if (!transaction.ammount) throw new ValidationError('Valor é um atributo obrigatório');
+    if (!transaction.date) throw new ValidationError('Data é um atributo obrigatório');
+    if (!transaction.acc_id) throw new ValidationError('Conta é um atributo obrigatório');
+    if (!transaction.type) throw new ValidationError('Tipo é um atributo obrigatório');
+    if (['I', 'O'].indexOf(transaction.type) === -1) throw new ValidationError('Tipo inválido');
 
-  return { find, save };
+    const newTransaction = { ...transaction };
+    if ((transaction.type === 'I' && transaction.ammount < 0)
+      || (transaction.type === 'O' && transaction.ammount > 0)) {
+      newTransaction.ammount *= -1;
+    }
+    return app.db('transactions').insert(newTransaction, '*');
+  };
+
+  const update = (id, transaction) => app.db('transactions').update(transaction, '*').where({ id });
+
+  const remove = (id) => app.db('transactions').del().where({ id });
+
+  return { find, save, update, remove };
 };
