@@ -15,8 +15,8 @@ beforeAll(async () => {
   await app.db('users').del();
 
   const users = await app.db('users').insert([
-    { name: 'User #1', mail: 'user1@mail.com', passwd: '"$2a$10$VJpF01q6oi6Ba2a8YSiyA.2NPxqxu2cEvn9kVomgqqAYWSAEo2CsC"' },
-    { name: 'User #2', mail: 'user2@mail.com', passwd: '"$2a$10$VJpF01q6oi6Ba2a8YSiyA.2NPxqxu2cEvn9kVomgqqAYWSAEo2CsC"' },
+    { name: 'User #1', mail: 'user1@mail.com', passwd: '$2a$10$VJpF01q6oi6Ba2a8YSiyA.2NPxqxu2cEvn9kVomgqqAYWSAEo2CsC' },
+    { name: 'User #2', mail: 'user2@mail.com', passwd: '$2a$10$VJpF01q6oi6Ba2a8YSiyA.2NPxqxu2cEvn9kVomgqqAYWSAEo2CsC' },
   ], '*');
   [user1, user2] = users;
 
@@ -161,5 +161,17 @@ test('Não deve remover uma transação de outro usuário', async () => {
     .then((res) => {
       expect(res.status).toBe(403);
       expect(res.body.error).toBe('Este recurso não pertence ao usuário');
+    });
+});
+
+test('Não deve remover conta com transação', async () => {
+  await app.db('transactions')
+    .insert({ description: 'T to Delete', date: new Date(), ammount: 100, type: 'I', acc_id: accUser1.id }, '*')
+    .then(() => request(app).delete(`/v1/accounts/${accUser1.id}`)
+      .set('authorization', `bearer ${user1.token}`)
+      .send({ description: 'Updated' }))
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Essa conta possui transações associadas');
     });
 });

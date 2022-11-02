@@ -19,6 +19,7 @@
             {
                 "multiline": true
             }
-        ]
+        ],
+        "arrow-body-style": "off"
     }
 }

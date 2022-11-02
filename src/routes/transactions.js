@@ -6,20 +6,20 @@ module.exports = (app) => {
   const router = express.Router();
   
   router.param('id', (req, res, next) => {
-    app.services.transaction.find(req.user.id, { 'transactions.id': req.params.id })
+    app.services.transaction.find({ 'transactions.id': req.params.id })
       .then((transaction) => {
-        if (transaction.length > 0) next();
+        if (transaction[0].user_id === req.user.id) next();
         else throw new RecursoIndevidoError();
       }).catch((err) => next(err));
   });
 
   router.get('/', (req, res, next) => {
-    app.services.transaction.find(req.user.id)
+    app.services.transaction.find({ 'accounts.user_id': req.user.id })
       .then((result) => res.status(200).json(result))
       .catch((err) => next(err));
   });
 
-  router.get('/:id', (req, res, next) => app.services.transaction.find(req.user.id, { 'transactions.id': req.params.id })
+  router.get('/:id', (req, res, next) => app.services.transaction.find({ 'transactions.id': req.params.id })
     .then((result) => res.status(200).json(result[0]))
     .catch((err) => next(err)));
 
