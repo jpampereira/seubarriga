@@ -6,8 +6,8 @@ const MAIN_ROUTE = '/v1/transfers';
 const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDAsIm5hbWUiOiJVc2VyICMxIiwibWFpbCI6InVzZXIxQG1haWwuY29tIn0.JSq1gBDZkpFjvqNUClEGlIEOOsPDdKbecd-OtCM_m0Y';
 
 beforeAll(async () => {
-  await app.db.migrate.rollback();
-  await app.db.migrate.latest();
+  // await app.db.migrate.rollback();
+  // await app.db.migrate.latest();
   await app.db.seed.run();
 });
 
@@ -79,6 +79,11 @@ describe('Ao salvar uma transferência válida...', () => {
   test('Ambas devem referenciar a transferência que as originou', () => {
     expect(income.transfer_id).toBe(transferId);
     expect(outcome.transfer_id).toBe(transferId);
+  });
+
+  test('Ambas devem estar com status de realizadas', () => {
+    expect(income.status).toBe(true);
+    expect(outcome.status).toBe(true);
   });
 });
 
