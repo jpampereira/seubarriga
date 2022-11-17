@@ -17,10 +17,10 @@
     }
   },
   "scripts": {
-    "start": "node src/server.js",
-    "test": "jest --coverage --runInBand --forceExit",
+    "start": "set SEUBARRIGA_ENV=prod&& node src/server.js",
+    "test": "set SEUBARRIGA_ENV=test&& jest --coverage --runInBand --forceExit",
     "lint": "eslint src/** test/** --fix",
-    "secure-mode": "jest --watchAll --verbose=false --runInBand"
+    "secure-mode": "set SEUBARRIGA_ENV=test&& jest --watchAll --verbose=false --runInBand"
   },
   "husky": {
     "hooks": {
@@ -49,6 +49,8 @@
     "moment": "2.22.2",
     "passport": "0.4.0",
     "passport-jwt": "4.0.0",
-    "pg": "8.0.3"
+    "pg": "8.0.3",
+    "uuidv4": "2.0.0",
+    "winston": "3.1.0"
   }
 }
